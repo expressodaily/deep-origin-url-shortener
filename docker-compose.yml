@@ -1,0 +1,44 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - app_network
+    environment:
+      - VITE_API_BASE_URL=http://127.0.0.1:4000
+
+  backend:
+    build: ./backend
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongodb
+    environment:
+      - PORT=4000
+      - DB_NAME=url-shortener-db
+      - DB_HOST=mongodb
+      - DB_PORT=27017
+      - JWT_SECRET=2
+    networks:
+      - app_network
+
+  mongodb:
+    image: mongo:6
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: url-shortener-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app_network
+
+volumes:
+  mongo_data:
+
+networks:
+  app_network:
